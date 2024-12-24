@@ -1,6 +1,7 @@
 """
 
 """
+from pprint import pprint
 import requests, inspect
 
 
@@ -77,7 +78,6 @@ class Query:
             login_res = self.relay_request(method='post', url=login_url, json=login_data, headers={"Content-Type": "application/json"})
             if login_res:
                 map = login_res.json().get('map')
-                print(f'Access-Token:{map}')
                 if map:
                     self.Session.headers.update(map)
                     entrydatagrid_url = '/user/s9010202/entrydatagrid'
@@ -90,9 +90,9 @@ class Query:
     def login_main(self, name='岳琳', idcard='230304198302014020', org_code=None):
         """
         登录并切换指定机构
-        :param: name 姓名
-        :param: idcard 身份证号
-        :param: org_code 机构代码
+        :param name: 姓名
+        :param idcard: 身份证号
+        :param org_code: 机构代码
         :return: None
         """
         login_res = self.login(name, idcard)
@@ -101,119 +101,233 @@ class Query:
             self.change_org(org_code)
             self.login(name, idcard)
     
-    def dyff_query(self, idcard):
+    def dyff_info(self, idcard="", person_id="", start_date="", end_date="", page=1, rows=10):
         """
         待遇发放明细查询
+        :param idcard: 社会保障号
+        :param person_id: 个人编号
+        :param start_date: 开始年月
+        :param end_date: 终止年月
+        :param page: 页码
+        :param rows: 每页显示数量
+        :return: 明细数据
         """
         dyff_url = '/business/m0027/EntryDatagrid'
         dyff_data = {
-            "aac002": idcard,             # 社会保障号
-            "aae041": "",                 # 开始年月
-            "aae042": "",                 # 终止年月
-            "aac001": "",                 # 个人编号
-            "page": 1,
-            "rows": 10
+            "aac002": idcard,       # 社会保障号
+            "aae041": start_date,   # 开始年月
+            "aae042": end_date,     # 终止年月
+            "aac001": person_id,    # 个人编号
+            "page": page,
+            "rows": rows
         }
         dyff_res = self.relay_request(method='post', url=dyff_url, data=dyff_data)
         if dyff_res:
-            print(dyff_res.text)
-
-    def rycb_info(self, idcard):
+            datas = dyff_res.json()
+            data_rows = datas.get('rows')
+            pprint(data_rows)
+            return data_rows
+        
+    def rycb_query(self, idcard="", person_id="", org_id="", ins_kind="", page=1, rows=10):
         """
         人员参保信息查询
+        :param idcard: 社会保障号
+        :param person_id: 个人编号
+        :param org_id: 单位编号
+        :param ins_kind: 险种
+        :param page: 页码
+        :param rows: 每页显示数量
+        :return: 明细数据
         """
         rycb_url = '/business/m5906/entry21'
         rycb_data = {
-            "aac001": "",                        # 个人编号
-            "aab001": "",                        # 单位编号
-            "aae140": "",                       # 险种
-            "aac002": idcard,                   # 社会保障号
-            "page": 1,
-            "rows": 10
+            "aac001": person_id,    # 个人编号
+            "aab001": org_id,       # 单位编号
+            "aae140": ins_kind,     # 险种
+            "aac002": idcard,       # 社会保障号
+            "page": page,
+            "rows": rows
         }
         rycb_res = self.relay_request(method='post', url=rycb_url, data=rycb_data)
         if rycb_res:
-            print(rycb_res.text)
-
-    def rysj_info(self, idcard):
+            datas = rycb_res.json()
+            data_rows = datas.get('rows')
+            pprint(data_rows)
+            return data_rows
+        
+    def rysj_query(self, idcard="", person_id="", org_id="", start_date="", end_date="", page=1, rows=10):
         """
         人员实缴信息查询
+        :param idcard: 社会保障号
+        :param person_id: 个人编号
+        :param org_id: 单位编号
+        :param start_date: 开始年月
+        :param end_date: 终止年月
+        :param page: 页码
+        :param rows: 每页显示数量
+        :return: 明细数据
         """
         rysj_url = '/business/m5908/entry21'
         rysj_data = {
-            "aac001": "",                       # 个人编号
-            "aac002": idcard,      # 社会保障号
-            "aab001": "",                       # 单位编号
-            "aae042": "",                    # 终止年月
-            "aae041": "",                    # 开始年月
-            "page": 1,
-            "rows": 10
+            "aac001": person_id,    # 个人编号
+            "aab001": org_id,       # 单位编号
+            "aac002": idcard,       # 社会保障号
+            "aae041": start_date,   # 开始年月
+            "aae042": end_date,     # 终止年月
+            "page": page,
+            "rows": rows
         }
         rysj_res = self.relay_request(method='post', url=rysj_url, data=rysj_data)
         if rysj_res:
-            print(rysj_res.text)
-
-    def dqdy_info(self, idcard):
+            datas = rysj_res.json()
+            data_rows = datas.get('rows')
+            pprint(data_rows)
+            return data_rows
+        
+    def dqdy_query(self, idcard="", person_id="", page=1, rows=10):
         """
         定期待遇信息查询
+        :param idcard: 社会保障号
+        :param person_id: 个人编号
+        :param page: 页码
+        :param rows: 每页显示数量
+        :return: 明细数据
         """
-        # dqdy_url = '/business/m5914/Entry21'
-        # dqdy_data = {
-        #     "aac001": "",                       # 个人编号
-        #     "aac002": idcard,                   # 社会保障号
-        #     "aab001": "",                       # 单位编号
-        #     "page": 1,
-        #     "rows": 10
-        # }
-        dqdy_url = '/business/m5914/entryOne'
+        dqdy_url = '/business/m5914/Entry21'
         dqdy_data = {
-            "aac001": "",
-            "aac002": "23030419730102402X",
-            "page": 1,
-            "rows": 10,
+            "aac002": idcard,       # 社会保障号
+            "aac001": person_id,    # 个人编号
+            "page": page,
+            "rows": rows
         }
         dqdy_res = self.relay_request(method='post', url=dqdy_url, data=dqdy_data)
         if dqdy_res:
-            print(dqdy_res.text)
-
-    def dyff_info(self, idcard):
+            datas = dqdy_res.json()
+            data_rows = datas.get('rows')
+            pprint(data_rows)
+            return data_rows
+    
+    def dyff_query(self, idcard="", person_id="", page=1, rows=10):
         """
         待遇发放信息查询
+        :param idcard: 社会保障号
+        :param person_id: 个人编号
+        :param page: 页码
+        :param rows: 每页显示数量
+        :return: 明细数据
         """
         dyff_url = '/business/m5918/entrydatagrid'
         dyff_data = {
-            "aac002": idcard,             # 社会保障号
-            "aac001": "",                 # 个人编号
-            "page": 1,
-            "rows": 10
+            "aac002": idcard,       # 社会保障号
+            "aac001": person_id,    # 个人编号
+            "page": page,
+            "rows": rows
         }
         dyff_res = self.relay_request(method='post', url=dyff_url, data=dyff_data)
         if dyff_res:
-            print(dyff_res.text)
-
-    def rzxx_info(self, idcard):
+            datas = dyff_res.json()
+            data_rows = datas.get('rows')
+            pprint(data_rows)
+            return data_rows
+        
+    def rzxx_query(self, idcard="", person_id="", start_date="", end_date="", auth_way="", page=1, rows=10):
         """
         认证信息查询
+        :param idcard: 社会保障号
+        :param person_id: 个人编号
+        :param start_date: 开始年月
+        :param end_date: 终止年月
+        :param auth_way: 认证方式
+        :param page: 页码
+        :param rows: 每页显示数量
+        :return: 明细数据
         """
         rzxx_url = '/business/m5919/entrydatagrid'
         rzxx_data = {
-            "aae041": "2023-01-01",               # 认证开始年月
-            "aae042": "2024-12-24",               # 认证终止年月
-            "aac001": "",                         # 个人编号
-            "aac002": idcard,                     # 社会保障号
-            "aaa135": ""                          # 认证方式
+            "aac002": idcard,       # 社会保障号
+            "aac001": person_id,    # 个人编号
+            "aae041": start_date,   # 开始年月
+            "aae042": end_date,     # 终止年月
+            "aaa135": auth_way,     # 认证方式
+            "page": page,
+            "rows": rows
         }
         rzxx_res = self.relay_request(method='post', url=rzxx_url, data=rzxx_data)
         if rzxx_res:
-            print(rzxx_res.text)
+            datas = rzxx_res.json()
+            data_rows = datas.get('rows')
+            pprint(data_rows)
+            return data_rows
 
+    def ryzh_query(self, idcard="", person_id="", name="", org_id="", page=1, rows=10):
+        """
+        人员账户查询
+        :param idcard: 社会保障号
+        :param person_id: 个人编号
+        :param name: 姓名
+        :param org_id: 单位编号
+        :param page: 页码
+        :param rows: 每页显示数量
+        :return: 明细数据
+        """
+        ryzh_url = '/business/m5924/queryPersonInfo'
+        ryzh_data = {
+            "queryParams[aac001]": person_id,   # 个人编号
+            "queryParams[aac002]": idcard,      # 社会保障号
+            "queryParams[aac003]": name,        # 姓名
+            "queryParams[aab001]": org_id,      # 单位编号
+            "queryParams[sa0200]": 111592421,
+            "timeout": 1000000,
+            "page": page,
+            "rows": rows
+        }
+        ryzh_res = self.relay_request(method='post', url=ryzh_url, data=ryzh_data)
+        if ryzh_res:
+            datas = ryzh_res.json()
+            data_rows = datas.get('rows')
+            pprint(data_rows)
+            return data_rows
+        
+    def ywbl_query(self, mode_id="", status="", idcard="", name="", start_date="", end_date="", do_people="", org_id="", org_name="", page=1, rows=10):
+        """
+        人员账户查询
+        :param mode_id: 模块编号
+        :param status: 业务状态
+        :param idcard: 社会保障号
+        :param name: 姓名
+        :param start_date: 开始日期
+        :param end_date: 终止日期
+        :param do_people: 经办人
+        :param org_id: 单位编号
+        :param org_name: 单位名称
+        :param page: 页码
+        :param rows: 每页显示数量
+        :return: 明细数据
+        """
+        ywbl_url = '/business/m0001/entryDatagrid'
+        ywbl_data = {
+            "sa0200": mode_id,      # 模块编号
+            "da0001": status,       # 业务状态
+            "applyID": idcard,      # 申请人ID
+            "applyName": name,      # 申请人姓名
+            "aae041": start_date,   # 开始日期
+            "aae042": end_date,     # 终止日期
+            "ua0100": do_people,    # 经办人
+            "aab001": org_id,       # 单位编号
+            "aab004": org_name,     # 单位名称
+            "page": page,
+            "rows": rows
+        }
+        ywbl_res = self.relay_request(method='post', url=ywbl_url, data=ywbl_data)
+        if ywbl_res:
+            datas = ywbl_res.json()
+            data_rows = datas.get('rows')
+            pprint(data_rows)
+            return data_rows
+    
 
 
 if __name__ == "__main__":
     Q = Query()
     Q.login_main(org_code='23030111')
-    # 23030419730102402X
-    Q.rzxx_info("23030419730102402X")
-
-
-    
+    Q.ywbl_query(idcard='23030419730102402X', start_date='20210901', end_date='20240915')
