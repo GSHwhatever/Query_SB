@@ -77,6 +77,7 @@ class Query:
             login_res = self.relay_request(method='post', url=login_url, json=login_data, headers={"Content-Type": "application/json"})
             if login_res:
                 map = login_res.json().get('map')
+                print(f'Access-Token:{map}')
                 if map:
                     self.Session.headers.update(map)
                     entrydatagrid_url = '/user/s9010202/entrydatagrid'
@@ -100,16 +101,16 @@ class Query:
             self.change_org(org_code)
             self.login(name, idcard)
     
-    def dyff_query(self):
+    def dyff_query(self, idcard):
         """
         待遇发放明细查询
         """
         dyff_url = '/business/m0027/EntryDatagrid'
         dyff_data = {
-            "aac002": "23030419730102402X",     # 社会保障号
+            "aac002": idcard,             # 社会保障号
             "aae041": "",                 # 开始年月
             "aae042": "",                 # 终止年月
-            "aac001": "2303000314840",                       # 个人编号
+            "aac001": "",                 # 个人编号
             "page": 1,
             "rows": 10
         }
@@ -117,38 +118,102 @@ class Query:
         if dyff_res:
             print(dyff_res.text)
 
-    # def dyff_query(self):
-    #     """
-    #     待遇发放明细查询
-    #     """
-    #     pass
+    def rycb_info(self, idcard):
+        """
+        人员参保信息查询
+        """
+        rycb_url = '/business/m5906/entry21'
+        rycb_data = {
+            "aac001": "",                        # 个人编号
+            "aab001": "",                        # 单位编号
+            "aae140": "",                       # 险种
+            "aac002": idcard,                   # 社会保障号
+            "page": 1,
+            "rows": 10
+        }
+        rycb_res = self.relay_request(method='post', url=rycb_url, data=rycb_data)
+        if rycb_res:
+            print(rycb_res.text)
 
-    # def dyff_query(self):
-    #     """
-    #     待遇发放明细查询
-    #     """
-    #     pass
+    def rysj_info(self, idcard):
+        """
+        人员实缴信息查询
+        """
+        rysj_url = '/business/m5908/entry21'
+        rysj_data = {
+            "aac001": "",                       # 个人编号
+            "aac002": idcard,      # 社会保障号
+            "aab001": "",                       # 单位编号
+            "aae042": "",                    # 终止年月
+            "aae041": "",                    # 开始年月
+            "page": 1,
+            "rows": 10
+        }
+        rysj_res = self.relay_request(method='post', url=rysj_url, data=rysj_data)
+        if rysj_res:
+            print(rysj_res.text)
 
-    # def dyff_query(self):
-    #     """
-    #     待遇发放明细查询
-    #     """
-    #     pass
+    def dqdy_info(self, idcard):
+        """
+        定期待遇信息查询
+        """
+        # dqdy_url = '/business/m5914/Entry21'
+        # dqdy_data = {
+        #     "aac001": "",                       # 个人编号
+        #     "aac002": idcard,                   # 社会保障号
+        #     "aab001": "",                       # 单位编号
+        #     "page": 1,
+        #     "rows": 10
+        # }
+        dqdy_url = '/business/m5914/entryOne'
+        dqdy_data = {
+            "aac001": "",
+            "aac002": "23030419730102402X",
+            "page": 1,
+            "rows": 10,
+        }
+        dqdy_res = self.relay_request(method='post', url=dqdy_url, data=dqdy_data)
+        if dqdy_res:
+            print(dqdy_res.text)
 
-    # def dyff_query(self):
-    #     """
-    #     待遇发放明细查询
-    #     """
-    #     pass
+    def dyff_info(self, idcard):
+        """
+        待遇发放信息查询
+        """
+        dyff_url = '/business/m5918/entrydatagrid'
+        dyff_data = {
+            "aac002": idcard,             # 社会保障号
+            "aac001": "",                 # 个人编号
+            "page": 1,
+            "rows": 10
+        }
+        dyff_res = self.relay_request(method='post', url=dyff_url, data=dyff_data)
+        if dyff_res:
+            print(dyff_res.text)
 
-    # def dyff_query(self):
-    #     """
-    #     待遇发放明细查询
-    #     """
-    #     pass
+    def rzxx_info(self, idcard):
+        """
+        认证信息查询
+        """
+        rzxx_url = '/business/m5919/entrydatagrid'
+        rzxx_data = {
+            "aae041": "2023-01-01",               # 认证开始年月
+            "aae042": "2024-12-24",               # 认证终止年月
+            "aac001": "",                         # 个人编号
+            "aac002": idcard,                     # 社会保障号
+            "aaa135": ""                          # 认证方式
+        }
+        rzxx_res = self.relay_request(method='post', url=rzxx_url, data=rzxx_data)
+        if rzxx_res:
+            print(rzxx_res.text)
+
 
 
 if __name__ == "__main__":
     Q = Query()
     Q.login_main(org_code='23030111')
-    Q.dyff_query()
+    # 23030419730102402X
+    Q.rzxx_info("23030419730102402X")
+
+
+    
